@@ -45,7 +45,7 @@ jobs:
           lines=$(cat /tmp/logs.txt)
 
           # Convert the lines into a JSON array
-          json_array=$(echo "$lines" | jq -R -s 'split("\n") | map(split(" ") | {_time: .[0], message: (.[1:] | join(" "))})')
+          json_array=$(echo "$lines" | jq -R -s 'split("\n") | map(split(" ") | {_time: .[0], message: (.[1:] | join(" "), run_id: "${{ github.run_id }}")})')
 
           # Specify the output file name
           output_file="/tmp/parsed_log_output.json"
