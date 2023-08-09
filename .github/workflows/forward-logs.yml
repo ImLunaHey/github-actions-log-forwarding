@@ -41,8 +41,8 @@ jobs:
 
       - name: Structure logs
         run: |
-          # Extract lines containing the timestamps and text from the log
-          lines=$(awk '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z/ { print $0 }' /tmp/logs.txt)
+          # Get logs
+          lines=$(cat /tmp/logs.txt)
 
           # Convert the lines into a JSON array
           json_array=$(echo "$lines" | jq -R -s 'split("\n") | map(select(length > 0))')
