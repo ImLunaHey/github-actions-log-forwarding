@@ -1,0 +1,28 @@
+name: Forward Logs
+
+on: [push]
+
+jobs:
+  forward_logs:
+    runs-on: ubuntu-latest
+    env:
+      AXIOM_TOKEN: xaat-09506dff-88e7-4b27-b21e-6344482ccb81
+      AXIOM_ORG_ID: imlunahey-9dym
+      AXIOM_DATASET: github-actions-forwarding
+    steps:
+      # Setup logs
+      - name: Setup syslog
+        run: sudo apt-get install rsyslog -y
+      - name: Install axiom syslog proxy
+        run: cd /tmp && git clone https://github.com/axiomhq/axiom-syslog-proxy.git && cd axiom-syslog-proxy && make install
+
+        # Setup bun
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      # Test
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Test
+        run: bun run test
