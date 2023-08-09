@@ -30,7 +30,7 @@ jobs:
           mkdir logs
           # Get the job ID of the last job in the workflow run
           LAST_JOB_ID=$(curl -s -u "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" \
-                        "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs/${{ github.run_id }}/jobs" | jq -r '.jobs[-1].id')
+                        "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs/${{ github.run_id }}/jobs" | jq -r '.jobs[-2].id')
           echo "LAST_JOB_ID: $LAST_JOB_ID"
 
           LOG_URL="https://api.github.com/repos/${{ github.repository }}/actions/jobs/$LAST_JOB_ID/logs"
