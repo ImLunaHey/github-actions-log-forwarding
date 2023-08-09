@@ -74,6 +74,7 @@ jobs:
           output_file="/tmp/parsed_log_output.json"
 
           # Save the structured logs
+          echo "OBJECTS: $objects"
           echo $objects | jq > $output_file
 
           echo "Parsed log data has been saved to $output_file"
