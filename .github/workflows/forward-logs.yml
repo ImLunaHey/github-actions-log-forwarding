@@ -74,16 +74,8 @@ jobs:
           output_file="/tmp/parsed_log_output.json"
 
           # Redirect the array of objects to the output file
-          {
-              echo "["
-              for ((i=0; i<${#objects[@]}; i++)); do
-                  echo "${objects[i]}"
-                  if [ $i -lt $((${#objects[@]} - 1)) ]; then
-                  echo ","
-                  fi
-              done
-              echo "]"
-          } > "$output_file"
+          {OLDIFS="$IFS"; IFS=$'\n' echo "${objects[*]}" > output_file
+          IFS="$OLDIFS"
 
           echo "Parsed log data has been saved to $output_file"
 
