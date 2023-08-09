@@ -59,7 +59,7 @@ jobs:
           API_TOKEN: xaat-09506dff-88e7-4b27-b21e-6344482ccb81
           DATASET_NAME: github-actions-forwarding
         run: |
-          cat /tmp/parsed_log_output.json | curl -X 'POST' 'https://api.axiom.co/v1/datasets/'$DATASET_NAME'/ingest' \
+          cat /tmp/parsed_log_output.json | jq '.' | curl -X 'POST' 'https://api.axiom.co/v1/datasets/'$DATASET_NAME'/ingest' \
             -H 'Authorization: Bearer '$API_TOKEN \
             -H 'Content-Type: application/json' \
             -d @-
