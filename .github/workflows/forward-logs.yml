@@ -3,6 +3,7 @@ name: Forward Logs
 on: [push]
 
 permissions:
+  actions: read
 
 jobs:
   test:
