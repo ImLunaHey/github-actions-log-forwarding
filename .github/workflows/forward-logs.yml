@@ -53,6 +53,7 @@ jobs:
           # Save the structured logs
           echo $json_array | jq > $output_file
           echo "Parsed log data has been saved to $output_file"
+          cat /tmp/parsed_log_output.json | jq '.'
 
       - name: Send logs to Axiom
         env:
