@@ -23,6 +23,7 @@ jobs:
       - name: Download workflow logs
         run: |
           mkdir logs
+          echo "URL: https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/logs"
           curl -s -o logs/logs.txt -u "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/logs"
           cat logs/logs.txt
