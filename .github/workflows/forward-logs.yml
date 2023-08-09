@@ -26,15 +26,12 @@ jobs:
       - name: Download workflow logs
         run: |
           mkdir logs
-          echo "URL: https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/logs"
-          curl -s -o logs/logs.txt -u "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/logs"
+          $URL="https://api.github.com/repos/${{ github.repository }}/commit/${{ github.sha }}/checks/${{ github.job }}/logs"
+          echo "URL: $URL"
+          curl -s -o logs/logs.txt -u "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" $URL
           cat logs/logs.txt
 
       - name: Create structured logs
-        env:
-          API_TOKEN: xaat-09506dff-88e7-4b27-b21e-6344482ccb81
-          DATASET_NAME: github-actions-forwarding
         run: |
           # Parse and structure the logs as JSON objects
           while IFS= read -r line; do
