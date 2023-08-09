@@ -25,6 +25,7 @@ jobs:
           mkdir logs
           curl -s -o logs/logs.txt -u "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/logs"
+          cat logs/logs.txt
 
       - name: Create structured logs
         env:
@@ -60,7 +61,8 @@ jobs:
           API_TOKEN: xaat-09506dff-88e7-4b27-b21e-6344482ccb81
           DATASET_NAME: github-actions-forwarding
         run: |
+          cat structured_logs.json && \
           cat structured_logs.json | curl -X 'POST' 'https://api.axiom.co/v1/datasets/'$DATASET_NAME'/ingest' \
-          -H 'Authorization: Bearer '$API_TOKEN \
-          -H 'Content-Type: application/x-ndjson' \
-          -d @-
+            -H 'Authorization: Bearer '$API_TOKEN \
+            -H 'Content-Type: application/x-ndjson' \
+            -d @-
