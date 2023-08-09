@@ -35,64 +35,20 @@ jobs:
           LOG_URL="https://api.github.com/repos/${{ github.repository }}/actions/jobs/$LAST_JOB_ID/logs"
           echo "LOG_URL: $LOG_URL"
 
-          retry_count=0
-          max_retries=5
-
-          while [ $retry_count -lt $max_retries ]; do
-            curl -L -s -o /tmp/logs.txt -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" $LOG_URL
-            LOG_SIZE=$(stat -c '%s' /tmp/logs.txt)
-            echo "LOG_SIZE: $LOG_SIZE"
-
-            if [ "$LOG_SIZE" -eq 0 ]; then
-              echo "Log size is 0. Retrying..."
-              sleep 30
-              retry_count=$((retry_count + 1))
-            else
-              echo "Log size is $LOG_SIZE. Exiting."
-              break
-            fi
-          done
-
-          if [ $retry_count -eq $max_retries ]; then
-            echo "Max retries reached. Failing the step."
-            exit 1
-          fi
-
-      - name: Create structured logs
-        run: |
-          # Parse and structure the logs as JSON objects
-          while IFS= read -r line; do
-            timestamp=$(echo "$line" | awk '{print $1}')
-            content=$(echo "$line" | cut -d ' ' -f 3-)
-            
-            # Check if the log line contains a [command] tag
-            if [[ "$content" =~ \[command\].* ]]; then
-                type="command"
-                command=$(echo "$content" | sed -E 's/\[command\]//')
-                
-                # Extract command arguments as an array
-                IFS=' ' read -ra args <<< "$command"
-                
-                content=""
-            else
-                type=$(echo "$line" | awk '{print $2}')
-                command=""
-                args=()
-            fi
-            
-            json="{\"timestamp\":\"$timestamp\",\"type\":\"$type\",\"command\":\"$command\",\"args\":$(printf '%s\n' "${args[@]}" | jq -R . | jq -s -c .),\"content\":\"$content\"}"
-            echo "$json" >> /tmp/structured_logs.json
-            done < /tmp/logs.txt
-
-          STRUCTURED_LOGS_SIZE=$(stat -c '%s' /tmp/structured_logs.json)
-          echo "STRUCTURED_LOGS_SIZE: $STRUCTURED_LOGS_SIZE"
+          curl -L -s -o /tmp/logs.txt -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" $LOG_URL
+          LOG_SIZE=$(stat -c '%s' /tmp/logs.txt)
+          echo "LOG_SIZE: $LOG_SIZE"
 
       - name: Send logs to Axiom
         env:
           API_TOKEN: xaat-09506dff-88e7-4b27-b21e-6344482ccb81
           DATASET_NAME: github-actions-forwarding
         run: |
-          cat /tmp/structured_logs.json | curl -X 'POST' 'https://api.axiom.co/v1/datasets/'$DATASET_NAME'/ingest' \
+          LOGS=$(cat /tmp/logs.txt)
+          DATA=$(jq --null-input \
+          --arg logs "$LOGS" \
+          '{"logs": $logs}')
+          curl -X 'POST' 'https://api.axiom.co/v1/datasets/'$DATASET_NAME'/ingest' \
             -H 'Authorization: Bearer '$API_TOKEN \
             -H 'Content-Type: application/x-ndjson' \
-            -d @-
+            -d $DATA
