@@ -1,23 +1,37 @@
 name: Forward Logs
 
-# Only trigger, when the test workflow succeeded
-on:
-  workflow_run:
-    workflows: ['Test']
-    types:
-      - completed
+on: [push]
 
 permissions:
   actions: read
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      # Setup bun
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      # Test
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Install deps
+        run: bun install
+      - name: Test
+        run: bun run test
   forward_logs:
     runs-on: ubuntu-latest
     steps:
       - name: Download workflow logs
         run: |
           mkdir logs
-          URL="https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/logs"
+          # Get the job ID of the last job in the workflow run
+          LAST_JOB_ID=$(curl -s -u "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" \
+                        "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs/${LAST_RUN_ID}/jobs" | jq -r '.jobs[-1].id')
+
+          URL="https://github.com/${{ github.repository }}/commit/${{ github.sha }}/checks/$LAST_JOB_ID/logs"
           echo "URL: $URL"
           curl -s -o logs/logs.txt -u "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" $URL
           cat logs/logs.txt
