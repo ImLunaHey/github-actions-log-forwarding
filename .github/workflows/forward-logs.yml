@@ -12,11 +12,7 @@ jobs:
       - name: Install axiom syslog proxy
         run: cd /tmp && wget https://github.com/axiomhq/axiom-syslog-proxy/releases/download/v0.5.0/axiom-syslog-proxy_0.5.0_linux_amd64.tar.gz && tar xvzf ./axiom-syslog-proxy_*.tar.gz
       - name: Start axiom syslog proxy
-        env:
-          AXIOM_TOKEN: xaat-09506dff-88e7-4b27-b21e-6344482ccb81
-          AXIOM_ORG_ID: imlunahey-9dym
-          AXIOM_DATASET: github-actions-forwarding
-        run: sudo /tmp/axiom-syslog-proxy_0.5.0_linux_amd64/axiom-syslog-proxy &
+        run: sudo AXIOM_TOKEN="xaat-09506dff-88e7-4b27-b21e-6344482ccb81" AXIOM_ORG_ID="imlunahey-9dym" AXIOM_DATASET="github-actions-forwarding" /tmp/axiom-syslog-proxy_0.5.0_linux_amd64/axiom-syslog-proxy &
 
       # Setup bun
       - uses: oven-sh/setup-bun@v1
