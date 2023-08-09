@@ -1,0 +1,23 @@
+name: Test
+
+on: [push]
+
+permissions:
+  actions: read
+
+jobs:
+  forward_logs:
+    runs-on: ubuntu-latest
+    steps:
+      # Setup bun
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      # Test
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install deps
+        run: bun install
+      - name: Test
+        run: bun run test

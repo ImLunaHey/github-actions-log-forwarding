@@ -1,6 +1,11 @@
 name: Forward Logs
 
-on: [push]
+# Only trigger, when the test workflow succeeded
+on:
+  workflow_run:
+    workflows: ['Test']
+    types:
+      - completed
 
 permissions:
   actions: read
@@ -9,33 +14,10 @@ jobs:
   forward_logs:
     runs-on: ubuntu-latest
     steps:
-      # Setup bun
-      - uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: latest
-
-      # Test
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Install deps
-        run: bun install
-      - name: Test
-        run: bun run test
-
-      # Logs
-      - name: Get Job ID from GH API
-        id: get-job-id
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          jobs=$(gh api repos/${{ github.repository }}/actions/runs/${{ github.run_id}}/attempts/${{ github.run_attempt }}/jobs)
-          job_id=$(echo $jobs | jq -r '.jobs[] | select(.runner_name=="${{ runner.name }}") | .id')
-          echo "job_id=$job_id" >> $GITHUB_OUTPUT
-
       - name: Download workflow logs
         run: |
           mkdir logs
-          URL="https://github.com/${{ github.repository }}/commit/${{ github.sha }}/checks/${{ steps.get-job-id.outputs.job_id }}/logs"
+          URL="https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/logs"
           echo "URL: $URL"
           curl -s -o logs/logs.txt -u "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" $URL
           cat logs/logs.txt
