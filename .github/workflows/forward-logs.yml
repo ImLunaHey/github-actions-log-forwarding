@@ -22,5 +22,7 @@ jobs:
       # Test
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Install deps
+        run: bun install
       - name: Test
-        run: bun run test
+        run: bun run test | logger
