@@ -37,6 +37,9 @@ jobs:
           echo "LOG_URL: $LOG_URL"
           curl -s -o /tmp/logs.txt -u "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" $LOG_URL
 
+          LOG_SIZE=$(stat -c '%s' /tmp/logs.txt)
+          echo "LOG_SIZE: $LOG_SIZE"
+
       - name: Create structured logs
         run: |
           # Parse and structure the logs as JSON objects
@@ -62,6 +65,9 @@ jobs:
             json="{\"timestamp\":\"$timestamp\",\"type\":\"$type\",\"command\":\"$command\",\"args\":$(printf '%s\n' "${args[@]}" | jq -R . | jq -s -c .),\"content\":\"$content\"}"
             echo "$json" >> /tmp/structured_logs.json
             done < /tmp/logs.txt
+
+          STRUCTURED_LOGS_SIZE=$(stat -c '%s' /tmp/structured_logs.json)
+          echo "STRUCTURED_LOGS_SIZE: $STRUCTURED_LOGS_SIZE"
 
       - name: Send logs to Axiom
         env:
