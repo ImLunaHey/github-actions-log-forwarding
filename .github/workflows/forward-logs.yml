@@ -39,7 +39,7 @@ jobs:
           max_retries=5
 
           while [ $retry_count -lt $max_retries ]; do
-            curl -s -o /tmp/logs.txt -u "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" $LOG_URL
+            curl -s -o /tmp/logs.txt -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" $LOG_URL
             LOG_SIZE=$(stat -c '%s' /tmp/logs.txt)
             echo "LOG_SIZE: $LOG_SIZE"
 
