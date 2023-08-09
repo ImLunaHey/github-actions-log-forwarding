@@ -41,42 +41,17 @@ jobs:
 
       - name: Structure logs
         run: |
-          # Initialize an empty array to store the objects
-          objects=()
+          # Extract lines containing the timestamps and text from the log
+          lines=$(awk '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z/ { print $0 }' /tmp/logs.txt)
 
-          # Initialize variables to store the current object data
-          timestamp=""
-          data=""
-
-          # Read the log line by line
-          while IFS= read -r line; do
-              # Check for timestamp lines
-              if [[ $line =~ ^([0-9T:.]+Z) ]]; then
-                # If data exists, add the current object to the array
-                if [ -n "$data" ]; then
-                  objects+=("{\"timestamp\":\"$timestamp\",\"logs\":$data}")
-                fi
-                # Reset the data variable and store the new timestamp
-                data=""
-                timestamp="${BASH_REMATCH[1]}"
-              else
-                # Append the line to the data variable
-                data+="$(echo "$line" | jq -Rs .),"
-              fi
-          done < <(cat /tmp/logs.txt)
-
-          # Add the last object to the array
-          if [ -n "$data" ]; then
-            objects+=("{\"timestamp\":\"$timestamp\",\"data\":$data}")
-          fi
+          # Convert the lines into a JSON array
+          json_array=$(echo "$lines" | jq -R -s 'split("\n") | map(select(length > 0))')
 
           # Specify the output file name
           output_file="/tmp/parsed_log_output.json"
 
           # Save the structured logs
-          echo "OBJECTS: $objects"
-          echo $objects | jq > $output_file
-
+          echo $json_array | jq > $output_file
           echo "Parsed log data has been saved to $output_file"
 
       - name: Send logs to Axiom
