@@ -73,9 +73,8 @@ jobs:
           # Specify the output file name
           output_file="/tmp/parsed_log_output.json"
 
-          # Redirect the array of objects to the output file
-          {OLDIFS="$IFS"; IFS=$'\n' echo "${objects[*]}" > output_file
-          IFS="$OLDIFS"
+          # Save the structured logs
+          echo $objects | jq > $output_file
 
           echo "Parsed log data has been saved to $output_file"
 
@@ -86,5 +85,5 @@ jobs:
         run: |
           cat /tmp/parsed_log_output.json | curl -X 'POST' 'https://api.axiom.co/v1/datasets/'$DATASET_NAME'/ingest' \
             -H 'Authorization: Bearer '$API_TOKEN \
-            -H 'Content-Type: application/json' \
+            -H 'Content-Type: application/x-ndjson' \
             -d @-
