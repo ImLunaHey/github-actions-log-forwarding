@@ -62,13 +62,13 @@ jobs:
             json="{\"timestamp\":\"$timestamp\",\"type\":\"$type\",\"command\":\"$command\",\"args\":$(printf '%s\n' "${args[@]}" | jq -R . | jq -s -c .),\"content\":\"$content\"}"
             echo "$json" >> structured_logs.json
             done < logs/logs.txt
+          cat structured_logs.json
 
       - name: Send logs to Axiom
         env:
           API_TOKEN: xaat-09506dff-88e7-4b27-b21e-6344482ccb81
           DATASET_NAME: github-actions-forwarding
         run: |
-          cat structured_logs.json && \
           cat structured_logs.json | curl -X 'POST' 'https://api.axiom.co/v1/datasets/'$DATASET_NAME'/ingest' \
             -H 'Authorization: Bearer '$API_TOKEN \
             -H 'Content-Type: application/x-ndjson' \
