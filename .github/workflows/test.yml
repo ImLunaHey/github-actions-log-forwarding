@@ -6,7 +6,7 @@ permissions:
   actions: read
 
 jobs:
-  forward_logs:
+  test:
     runs-on: ubuntu-latest
     steps:
       # Setup bun
@@ -16,7 +16,7 @@ jobs:
 
       # Test
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
       - name: Install deps
         run: bun install
       - name: Test
