@@ -14,9 +14,11 @@ jobs:
       - name: Setup syslog
         run: sudo apt-get install rsyslog -y
       - name: Install axiom syslog proxy
-        run: cd /tmp && git clone https://github.com/axiomhq/axiom-syslog-proxy.git && cd axiom-syslog-proxy && make install
+        run: cd /tmp && wget https://github.com/axiomhq/axiom-syslog-proxy/releases/download/v0.5.0/axiom-syslog-proxy_0.5.0_linux_amd64.tar.gz && tar xvzf ./axiom-syslog-proxy_*.tar.gz
+      - name: Start axiom syslog proxy
+        run: /tmp/axiom-syslog-proxy_0.5.0_linux_amd64/axiom-syslog-proxy &
 
-        # Setup bun
+      # Setup bun
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
