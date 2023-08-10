@@ -50,7 +50,7 @@ jobs:
             message: .[1:] | join(" "),
             run_id: "${{ github.run_id }}",
             repository: "${{ github.repository }}",
-            event: "${{ github.event }}",
+            event_name: "${{ github.event_name }}",
             commit: "${{ github.sha }}"
           })')
 

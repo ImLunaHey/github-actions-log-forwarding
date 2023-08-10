@@ -1,14 +1,14 @@
 {
   "name": "github-actions-forwarding",
   "module": "index.ts",
-  "type": "module",
-  "scripts": {
-    "test": "echo 'Success' && exit 0"
-  },
   "devDependencies": {
     "bun-types": "latest"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
-  }
+  },
+  "scripts": {
+    "test": "echo 'Success' && exit 0"
+  },
+  "type": "module"
 }
